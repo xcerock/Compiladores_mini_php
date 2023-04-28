@@ -4,6 +4,7 @@ import miniphp_lex
 import sys
 
 VERBOSE = 1
+error_found = False
 
 def p_program(p):
     'program : OPENPHP declaration_list CLOSEPHP'
@@ -196,7 +197,9 @@ def p_empty(p):
     pass
 
 def p_error(p):
-    if VERBOSE:
+    global error_found
+    error_found = True
+    if VERBOSE == 1:
         if p is not None:
             print("ERROR SINTACTICO EN LA LINEA " + str(p.lexer.lineno) + " NO SE ESPERABA EL TOKEN  " + str(p.value))
         else:
@@ -207,13 +210,14 @@ def p_error(p):
 parser = yacc.yacc()
 
 if __name__ == '__main__':
-
     if len(sys.argv) > 1:
         file = sys.argv[1]
     else:
         file = 'test.php'
-
     f = open(file, 'r')
     data = f.read()
     parser.parse(data, tracking=True)
-    print("El analizador sintáctico ha reconocido correctamente todo")
+    
+    if not error_found: 
+        print("El analisis sintactico ha finalizado correctamente")
+    
